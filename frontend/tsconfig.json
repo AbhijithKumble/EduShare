@@ -1,14 +1,5 @@
 {
   "files": [],
-  "compilerOptions": {
-    "target": "ES6",
-    "module": "CommonJS",
-    "outDir": "./dist",
-    "rootDir": "./scripts",
-    "strict": true
-  },
-  "include": ["scripts/**/*.ts"],
-  "exclude": ["node_modules"],
   "references": [
     {
       "path": "./tsconfig.app.json"
