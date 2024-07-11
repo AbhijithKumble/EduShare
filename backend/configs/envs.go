@@ -8,58 +8,63 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// Config represents the configuration needed for the application
 type Config struct {
-	PORT   string
-	DB     string
-	CLIENT string
+	Port       string
+	Db         string
+	Host       string
+	JWT_SECRET string
 }
 
-func checkEnvs(envString, name string) error {
-	if envString == "" {
-		return fmt.Errorf("environment variable '%s' is empty", name)
+var Envs = initConfig()
+
+func initConfig() *Config {
+
+	config, err := GetConfig()
+
+	if err != nil {
+		log.Fatal("Error in getting envs")
+		return nil
+	}
+	return config
+}
+
+// checkEnvs verifies that all required environment variables are set
+func (c *Config) checkEnvs() error {
+	if c.Port == "" {
+		return fmt.Errorf("environment variable 'Port' is empty")
+	}
+	if c.Db == "" {
+		return fmt.Errorf("environment variable 'Db' is empty")
+	}
+	if c.Host == "" {
+		return fmt.Errorf("environment variable 'Host' is empty")
+	}
+	if c.JWT_SECRET == "" {
+		return fmt.Errorf("environment variable 'JWT_SECRET' is empty")
 	}
 	return nil
 }
 
-func getEnvs() (Config, error) {
-	err := godotenv.Load()
+// GetConfig initializes a new Config struct by loading environment variables
+func GetConfig() (*Config, error) {
+
+	err := godotenv.Load(".env")
+
 	if err != nil {
-		return Config{}, fmt.Errorf("error loading .env file: %v", err)
+		return nil, fmt.Errorf(" error loading .env file: %v", err)
 	}
 
-	portString := os.Getenv("PORT")
-	dbString := os.Getenv("DB")
-	clientString := os.Getenv("CLIENT")
-
-	if err := checkEnvs(portString, "PORT"); err != nil {
-		return Config{}, err
+	config := &Config{
+		Port:       os.Getenv("PORT"),
+		Db:         os.Getenv("DB"),
+		Host:       os.Getenv("HOST"),
+		JWT_SECRET: os.Getenv("JWT_SECRET"),
 	}
 
-	if err := checkEnvs(dbString, "DB"); err != nil {
-		return Config{}, err
+	if err := config.checkEnvs(); err != nil {
+		return nil, err
 	}
 
-	if err := checkEnvs(clientString, "CLIENT"); err != nil {
-		return Config{}, err
-	}
-
-	configs := Config{
-		PORT:   portString,
-		DB:     dbString,
-		CLIENT: clientString,
-	}
-
-	return configs, nil
+	return config, nil
 }
-
-// Envs is the configuration loaded from environment variables
-var Envs Config
-
-func init() {
-	var err error
-	Envs, err = getEnvs()
-	if err != nil {
-		log.Fatalf("error loading configuration: %v", err)
-	}
-}
-
