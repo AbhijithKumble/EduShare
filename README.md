@@ -100,13 +100,29 @@ Contributions are welcome! Please follow these steps:
     ```
 3. Make your changes and commit them:
     ```bash
+    git add .
     git commit -m "Add new feature"
     ```
+   - Use clear and concise commit messages.
+   - Follow the commit message convention:
+     - **feat:** A new feature
+     - **fix:** A bug fix
+     - **docs:** Documentation only changes
+     - **style:** Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
+     - **refactor:** A code change that neither fixes a bug nor adds a feature
+     - **perf:** A code change that improves performance
+     - **test:** Adding missing or correcting existing tests
+     - **chore:** Changes to the build process or auxiliary tools and libraries such as documentation generation
+   - Example commit message:
+     ```bash
+     git commit -m "feat: add user authentication"
+     ```
 4. Push to the branch:
     ```bash
     git push origin feature-branch
     ```
 5. Create a pull request.
+6. Make sure to add test cases to the project.
 
 ## License
 
