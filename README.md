@@ -1,6 +1,22 @@
-# EduShare
+# EduShare - University Course Resource Management System
 
-EduShare is a platform that stores resources to study various courses offered by a University.
+EduShare is a platform built with a Vite+React frontend and a Go backend, utilizing a PostgreSQL database. This platform is designed to streamline the process of uploading, verifying, and organizing university course resources.
+Key Features:
+
+    Resource Upload: Easily upload course materials including previous years' questions (PYQs), books, and other educational resources.
+    Category Sorting: Automatically categorize uploaded resources for efficient organization and retrieval.
+    Admin Verification: Ensure the quality and accuracy of resources with an admin verification process before they are made publicly available.
+    User-Friendly Interface: Intuitive and responsive design for seamless user experience.
+    Secure Storage: Leveraging PostgreSQL for reliable and secure data storage.
+
+Motivation
+
+In many colleges, resources are often shared through inefficient methods like WhatsApp or college-provided drives. This project aims to provide a more organized and accessible platform for managing and distributing educational resources.
+Tech Stack
+
+    Frontend: Vite, React
+    Backend: Go
+    Database: PostgreSQL
 
 ## Table of Contents
 - [Installation](#installation)
@@ -12,7 +28,13 @@ EduShare is a platform that stores resources to study various courses offered by
 - [Contact](#contact)
 
 ## Installation
-
+    Getting Started
+    
+      Clone the repository.
+      Set up the PostgreSQL database.
+      Configure the backend server.
+      Run the frontend and backend services.
+      
 ### Frontend
 
 The frontend is built using the Vite framework and React Router 6 for routing. `pnpm` is used as the package manager because it saves space.
