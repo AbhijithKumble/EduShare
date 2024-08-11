@@ -7,8 +7,7 @@ import (
 	"time"
 
 	"github.com/AbhijithKumble/EduShare/backend/services/serverhealth"
-	"github.com/AbhijithKumble/EduShare/backend/services/signup"
-	"github.com/AbhijithKumble/EduShare/backend/services/verify"
+	"github.com/AbhijithKumble/EduShare/backend/services/user"
 	"github.com/gorilla/mux"
 )
 
@@ -32,13 +31,9 @@ func (s *ApiServer) Run() error {
 	health := serverhealth.NewHandler()
 	health.RegisterRoutes(subRouter)
 
-	signupStore := signup.NewStore(s.db)
-	signupHandler := signup.NewHandler(signupStore)
-	signupHandler.RegisterRoutes(subRouter)
-
-	verifyStore := verify.NewStore(s.db)
-	verifyHandler := verify.NewHandler(verifyStore)
-	verifyHandler.RegisterRoutes(subRouter)
+    userStore := user.NewStore(s.db)
+    userHandler := user.NewHandler(userStore) 
+    userHandler.RegisterRoutes(subRouter)
 
 	// add routing config above
 	srv := &http.Server{
