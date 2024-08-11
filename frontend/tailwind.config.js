@@ -9,7 +9,10 @@ export default {
         fontFamily:{
             poppins:["Poppins", "sans-serif"],
             grotesque: ["Darker grotesque", "sans-serif"],
-        }
+        },
+        colors: {
+          'custompink': 'rgba(244, 239, 255, 1)',
+        },
     },
   },
   plugins: [],
