@@ -14,25 +14,24 @@ func NewHandler() *Handler {
 }
 
 func (h *Handler) RegisterRoutes(r *mux.Router) {
-    r.HandleFunc("/health", h.healthGet).Methods("GET")
+	r.HandleFunc("/health", h.healthGet).Methods("GET")
 	r.HandleFunc("/health", h.healthPost).Methods("POST")
 	r.HandleFunc("/health", h.healthDelete).Methods("DELETE")
 	r.HandleFunc("/health", h.healthPatch).Methods("PATCH")
 }
 
 func (h *Handler) healthPost(w http.ResponseWriter, r *http.Request) {
-	utils.RespondWithJSON(w, 200, "Hello this route is ready handle POST request")
+	utils.WriteJSON(w, 200, "Hello this route is ready handle POST request")
 }
 
 func (h *Handler) healthPatch(w http.ResponseWriter, r *http.Request) {
-	utils.RespondWithJSON(w, 200, "Hello this route is ready handle PATCH request")
+	utils.WriteJSON(w, 200, "Hello this route is ready handle PATCH request")
 }
 
 func (h *Handler) healthGet(w http.ResponseWriter, r *http.Request) {
-	utils.RespondWithJSON(w, 200, "Hello this route is ready handle GET request")
+	utils.WriteJSON(w, 200, "Hello this route is ready handle GET request")
 }
 
 func (h *Handler) healthDelete(w http.ResponseWriter, r *http.Request) {
-	utils.RespondWithJSON(w, 200, "Hello this route is ready handle DELETE request")
+	utils.WriteJSON(w, 200, "Hello this route is ready handle DELETE request")
 }
-

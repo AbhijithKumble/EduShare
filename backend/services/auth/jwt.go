@@ -12,7 +12,7 @@ import (
 )
 
 func CreateJWT(secret []byte, userID int) (string, error) {
-	expiration := time.Second * time.Duration(configs.Envs.JWT_EXPIRATION_IN_SECONDS )
+	expiration := time.Second * time.Duration(configs.Envs.JWT_EXPIRATION_IN_SECONDS)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"userID":    strconv.Itoa(int(userID)),
@@ -26,7 +26,6 @@ func CreateJWT(secret []byte, userID int) (string, error) {
 
 	return tokenString, err
 }
-
 
 func validateJWT(tokenString string) (*jwt.Token, error) {
 	return jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {

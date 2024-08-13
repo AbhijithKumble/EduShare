@@ -10,8 +10,8 @@ import (
 
 func main() {
 
-    dbString := configs.Envs.Db
-    portString := configs.Envs.Port
+	dbString := configs.Envs.Db
+	portString := configs.Envs.Port
 
 	// connect to the database
 	connPool, err := db.ConnectDb(dbString)

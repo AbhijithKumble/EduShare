@@ -15,7 +15,7 @@ import (
 )
 
 type Handler struct {
-	store types.UserStore 
+	store types.UserStore
 }
 
 func NewHandler(store types.UserStore) *Handler {
@@ -23,45 +23,45 @@ func NewHandler(store types.UserStore) *Handler {
 }
 
 func (h *Handler) RegisterRoutes(r *mux.Router) {
-    r.HandleFunc("/login", h.HandleSignup).Methods("POST")
+	r.HandleFunc("/login", h.HandleLogin).Methods("POST")
 	r.HandleFunc("/signup", h.HandleSignup).Methods("POST")
 }
 
 func (h *Handler) HandleLogin(w http.ResponseWriter, r *http.Request) {
-    var user types.LoginUserPayload 
+	var user types.LoginUserPayload
 
-    if err := utils.ParseJSON(r, &user); err != nil  {
-        utils.WriteError(w, http.StatusBadRequest,err)
-    }
-    
-    if err := utils.Validate.Struct(user); err != nil {
-        errors := err.(validator.ValidationErrors)
+	if err := utils.ParseJSON(r, &user); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+	}
+
+	if err := utils.Validate.Struct(user); err != nil {
+		errors := err.(validator.ValidationErrors)
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid payload: %v", errors))
 		return
-    }
+	}
 
-    u, err := h.store.GetUserByEmail(r.Context(), user.Email)
+	u, err := h.store.GetUserByEmail(r.Context(), user.Email)
 
-    if err!= nil {
-        utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("not found, invalid email or password"))
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("not found, invalid email or password"))
 		return
-    }
+	}
 
-    if !auth.ComparePassword(u.Password, user.Password) {
+	if !auth.ComparePassword(u.Password, user.Password) {
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid email or password"))
 		return
 	}
 
-    secret := []byte(configs.Envs.JWT_SECRET) 
+	secret := []byte(configs.Envs.JWT_SECRET)
 
-    token, err := auth.CreateJWT(secret, u.UserID)
+	token, err := auth.CreateJWT(secret, u.UserID)
 
-    if err!= nil {
-        utils.WriteError(w, http.StatusInternalServerError, err)
-        return 
-    }
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
 
-    utils.WriteJSON(w, http.StatusOK , map[string]string {"token": token})
+	utils.WriteJSON(w, http.StatusOK, map[string]string{"token": token})
 }
 
 func (h *Handler) HandleSignup(w http.ResponseWriter, r *http.Request) {
