@@ -3,24 +3,30 @@ package types
 import (
 	"context"
 	"time"
+
+	"github.com/google/uuid"
 )
 
-type User struct {
-	UserID                    int       `json:"id"`
-	FirstName                 string    `json:"firstName"`
-	MiddleName                string    `json:"middleName"`
-	LastName                  string    `json:"lastName"`
-	Dept                      string    `json:"dept"`
+type UserAcc struct {
+	UserID                    uuid.UUID `json:"id"`
 	Email                     string    `json:"email"`
 	Password                  string    `json:"-"`
 	CreatedAt                 time.Time `json:"createdAt"`
 	UpdatedAt                 time.Time `json:"updatedAt"`
-	IsDeptAdmin               bool      `json:"isDeptAdmin"`
 	IsVerified                bool      `json:"isVerified"`
-	VerificationToken         string    `json:"verificationToken"`
-	VerificationTokenExpiry   time.Time `json:"verificationTokenExpiry"`
-	ForgotPasswordToken       string    `json:"forgotPasswordToken"`
-	ForgotPasswordTokenExpiry time.Time `json:"forgotPasswordTokenExpiry"`
+	IsAdmin                   bool      `json:"isAdmin"`
+	VerificationToken         *string    `json:"verificationToken"`
+	VerificationTokenExpiry   *time.Time `json:"verificationTokenExpiry"`
+	ForgotPasswordToken       *string    `json:"forgotPasswordToken"`
+	ForgotPasswordTokenExpiry *time.Time `json:"forgotPasswordTokenExpiry"`
+}
+
+type UserInfo struct {
+	FirstName   string `json:"firstName"`
+	MiddleName  string `json:"middleName"`
+	LastName    string `json:"lastName"`
+	Dept        string `json:"dept"`
+	IsDeptAdmin bool   `json:"isDeptAdmin"`
 }
 
 type LoginUserPayload struct {
@@ -29,7 +35,6 @@ type LoginUserPayload struct {
 }
 
 type UserStore interface {
-	GetUserByEmail(c context.Context, email string) (User, error)
-	CreateUser(c context.Context, user User) error
+	GetUserByEmail(c context.Context, email string) (UserAcc, error)
+	CreateUser(c context.Context, user UserAcc) error
 }
-

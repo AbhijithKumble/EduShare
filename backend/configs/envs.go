@@ -57,7 +57,7 @@ func (c *Config) checkEnvs() error {
 func GetConfig() (*Config, error) {
 
 	err := godotenv.Load(".env")
-
+  
 	if err != nil {
 		return nil, fmt.Errorf(" error loading .env file: %v", err)
 	}
@@ -69,7 +69,6 @@ func GetConfig() (*Config, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error parsing JWT_EXPIRATION_IN_SECONDS: %v", err)
 	}
-
 	config := &Config{
 		Port:                      os.Getenv("PORT"),
 		Db:                        os.Getenv("DB"),

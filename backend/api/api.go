@@ -31,9 +31,9 @@ func (s *ApiServer) Run() error {
 	health := serverhealth.NewHandler()
 	health.RegisterRoutes(subRouter)
 
-    userStore := user.NewStore(s.db)
-    userHandler := user.NewHandler(userStore) 
-    userHandler.RegisterRoutes(subRouter)
+	userStore := user.NewStore(s.db)
+	userHandler := user.NewHandler(userStore)
+	userHandler.RegisterRoutes(subRouter)
 
 	// add routing config above
 	srv := &http.Server{

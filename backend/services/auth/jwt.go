@@ -3,19 +3,19 @@ package auth
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/AbhijithKumble/EduShare/backend/configs"
 	"github.com/AbhijithKumble/EduShare/backend/utils"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
-func CreateJWT(secret []byte, userID int) (string, error) {
+func CreateJWT(secret []byte, userID uuid.UUID) (string, error) {
 	expiration := time.Second * time.Duration(configs.Envs.JWT_EXPIRATION_IN_SECONDS)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"userID":    strconv.Itoa(int(userID)),
+		"userID":    userID,
 		"expiresAt": time.Now().Add(expiration).Unix(),
 	})
 

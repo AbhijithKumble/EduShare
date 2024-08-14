@@ -81,19 +81,22 @@ func (h *Handler) HandleSignup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//create user
-	err = h.store.CreateUser(r.Context(), params.Email, params.Password)
+	var user types.UserAcc
+	user.Email = params.Email
+	user.Password = params.Password
+	err = h.store.CreateUser(r.Context(), user)
 
 	if err != nil {
 		switch err.Error() {
 		case "user already exists in database":
-			utils.RespondWithError(w, 409, "User already exists")
+			utils.WriteError(w, 409, fmt.Errorf("User already exists"))
 
 		default:
 			log.Printf("error creating user %v", err)
-			utils.RespondWithError(w, 500, "Something went wrong")
+			utils.WriteError(w, 500, fmt.Errorf("Something went wrong"))
 		}
 		return
 	}
 
-	utils.RespondWithJSON(w, 201, "User created Successfully")
+	utils.WriteError(w, 201, fmt.Errorf("User created Successfully"))
 }

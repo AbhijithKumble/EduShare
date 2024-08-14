@@ -19,7 +19,7 @@ func NewStore(db *sql.DB) *Store {
 	return &Store{db: db}
 }
 
-func (s *Store) CreateUser(c context.Context, user types.User) error {
+func (s *Store) CreateUser(c context.Context, user types.UserAcc) error {
 	checkQ := `SELECT EXISTS(SELECT 1 FROM users WHERE Email=$1)`
 	var exists bool
 
@@ -44,8 +44,8 @@ func (s *Store) CreateUser(c context.Context, user types.User) error {
 
 	// adding a user into database
 
-	insertQ := `INSERT INTO users(UserID, FirstName, MiddleName, LastName, Email,
-                Password, Dept) VALUES ($1, $2, $3, $4, $5, $6, $7)`
+	insertQ := `INSERT INTO users(UserID, Email, Password) VALUES 
+              ($1, $2, $3)`
 
 	hashedPassword, err := auth.HashPassword(user.Password)
 
@@ -53,8 +53,8 @@ func (s *Store) CreateUser(c context.Context, user types.User) error {
 		return err
 	}
 
-	_, err = conn.ExecContext(c, insertQ, uuid.New(), user.FirstName,
-		user.MiddleName, user.LastName, user.Email, hashedPassword, user.Dept)
+	_, err = conn.ExecContext(c, insertQ, uuid.New(), user.Email,
+		hashedPassword)
 
 	if err != nil {
 		return err
@@ -63,30 +63,34 @@ func (s *Store) CreateUser(c context.Context, user types.User) error {
 	return nil
 }
 
-func (s *Store) GetUserByEmail(c context.Context, email string) (types.User, error) {
+func (s *Store) GetUserByEmail(c context.Context, email string) (types.UserAcc, error) {
 
 	conn, err := s.db.Conn(c)
 
 	if err != nil {
 		log.Fatal("error getting connection to db")
-		return types.User{}, err
+		return types.UserAcc{}, err
 	}
 
 	defer conn.Close()
 
-	query := `SELECT * FROM users WHERE Email  = $1`
+	query := `SELECT * FROM users WHERE Email =$1`
 
-	row := conn.QueryRowContext(c, query, email)
-
-	var user types.User
-	err = row.Scan(&user)
+	row := conn.QueryRowContext(c, query, string(email))
+  
+  var user types.UserAcc
+  
+	err = row.Scan(&user.UserID, &user.Email, &user.Password, &user.CreatedAt,
+        &user.UpdatedAt, &user.IsVerified, &user.IsAdmin, 
+        &user.VerificationToken, &user.VerificationTokenExpiry,
+        &user.ForgotPasswordToken, &user.ForgotPasswordTokenExpiry)
 
 	switch {
 
 	case err == sql.ErrNoRows:
-		return types.User{}, fmt.Errorf("user not found")
+		return types.UserAcc{}, fmt.Errorf("user not found")
 	case err != nil:
-		return types.User{}, err
+		return types.UserAcc{}, err
 	default:
 		return user, nil
 	}
