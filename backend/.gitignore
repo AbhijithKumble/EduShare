@@ -1,3 +1,4 @@
 .env
-bin/
-vendor/
+bin
+vendor
+.vscode
