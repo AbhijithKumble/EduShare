@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Home } from "./pages/Home";
 import Signin from "./pages/Signin";
@@ -59,6 +60,17 @@ const App = () => {
   //            </div>
   //        </div>
   //    );
+=======
+import React from "react";
+
+const App = ({children } :{children: React.ReactNode} ) => {
+
+    return (
+        <div className="bg-black h-screen sm:px-12 sm:py-8 min-w-[375px]">
+            {children}
+        </div>
+    );
+>>>>>>> b7ef97d (login form and register form created)
 };
 
 export default App;
