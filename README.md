@@ -16,9 +16,10 @@ In many colleges, resources are often shared through inefficient methods like Wh
 
 ## Tech Stack
 
-- **Frontend**: Vite, React
+- **Frontend**: Vite, React, shadcn/ui
 - **Backend**: Go
 - **Database**: PostgreSQL
+- **Validation**: zod
 
 ## Table of Contents
 
