@@ -2,108 +2,112 @@
 
 EduShare is a platform built with a Vite+React frontend and a Go backend, utilizing a PostgreSQL database. This platform is designed to streamline the process of uploading, verifying, and organizing university course resources.
 
-Key Features:
+## Key Features
 
-- Resource Upload: Easily upload course materials including previous years' questions (PYQs), books, and other educational resources.
-- Category Sorting: Automatically categorize uploaded resources for efficient organization and retrieval.
-- Admin Verification: Ensure the quality and accuracy of resources with an admin verification process before they are made publicly available.
-- User-Friendly Interface: Intuitive and responsive design for seamless user experience.
-- Secure Storage: Leveraging PostgreSQL for reliable and secure data storage.
+- **Resource Upload**: Easily upload course materials including previous years' questions (PYQs), books, and other educational resources.
+- **Category Sorting**: Automatically categorize uploaded resources for efficient organization and retrieval.
+- **Admin Verification**: Ensure the quality and accuracy of resources with an admin verification process before they are made publicly available.
+- **User-Friendly Interface**: Intuitive and responsive design for seamless user experience.
+- **Secure Storage**: Leveraging PostgreSQL for reliable and secure data storage.
 
-Motivation
+## Motivation
 
 In many colleges, resources are often shared through inefficient methods like WhatsApp or college-provided drives. This project aims to provide a more organized and accessible platform for managing and distributing educational resources.
-Tech Stack
 
-    Frontend: Vite, React
-    Backend: Go
-    Database: PostgreSQL
+## Tech Stack
+
+- **Frontend**: Vite, React
+- **Backend**: Go
+- **Database**: PostgreSQL
 
 ## Table of Contents
+
 - [Installation](#installation)
   - [Frontend](#frontend)
   - [Backend](#backend)
 - [Usage](#usage)
+- [Makefile Details](#makefile-details)
+- [Environment Variables](#environment-variables)
 - [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
 
 ## Installation
-    Getting Started
-    
-      Clone the repository.
-      Set up the PostgreSQL database.
-      Configure the backend server.
-      Run the frontend and backend services.
-      
+
+### Getting Started
+
+1. **Clone the repository**:
+    ```bash
+    git clone https://github.com/yourusername/edushare.git
+    cd edushare
+    ```
+
+2. **Set up the PostgreSQL database**:
+    - Install PostgreSQL if you haven't already.
+    - Create a new database named `edushare`:
+      ```bash
+      createdb edushare
+      ```
+    - Configure your PostgreSQL user credentials in the `.env` file.
+
+3. **Configure the backend server**:
+    - Create a `.env` file in the `backend` directory with the necessary environment variables (details provided below).
+
+4. **Run the frontend and backend services**:
+    - Start the backend server using `make run`.
+    - Start the frontend development server using `pnpm run dev`.
+
 ### Frontend
 
-The frontend is built using the Vite framework and React Router 6 for routing. `pnpm` is used as the package manager because it saves space.
-
-1. Navigate to the frontend directory:
+1. **Navigate to the frontend directory**:
     ```bash
     cd frontend
     ```
 
-2. Install the dependencies:
+2. **Install the dependencies**:
     ```bash
     pnpm install
     ```
 
-3. Build the project:
+3. **Build the project**:
     ```bash
     pnpm build
     ```
 
-4. Run the development server:
+4. **Run the development server**:
     ```bash
     pnpm run dev
     ```
 
 ### Backend
 
-The backend is developed using Go, with Goose for database migration and PostgreSQL as the database.
-
-1. Navigate to the backend directory:
+1. **Navigate to the backend directory**:
     ```bash
     cd backend
     ```
 
-2. Install Go on your machine: [Go installation](https://go.dev/doc/install)
+2. **Install Go on your machine**: [Go installation](https://go.dev/doc/install)
 
-3. Check the Makefile for easier build and install commands.
+3. **Set up environment variables**: Create a `.env` file in the backend directory (details provided below).
 
-4. To migrate databases specified in the Makefile, use:
-    ```bash
-    make migrate-up
-    make migrate-down
-    ```
-
-5. Install the dependencies locally:
+4. **Install the dependencies locally**:
     ```bash
     go mod vendor
     ```
 
-6. Install all dependencies in the project directory:
+5. **Run database migrations**:
     ```bash
-    go get .
+    make migrate-up
     ```
 
-7. Clean all unused dependencies:
+6. **Build the backend**:
     ```bash
-    go mod tidy
+    make build
     ```
 
-8. Install all dependencies to the root Go folder:
+7. **Run the backend**:
     ```bash
-    go install .
-    ```
-
-9. Set the environment variables as required.
-
-10. Build the project into the output directory:
-    ```bash
-    go build -o build/edushare/
+    make run
     ```
 
 ## Usage
@@ -111,6 +115,66 @@ The backend is developed using Go, with Goose for database migration and Postgre
 1. Ensure both the frontend and backend servers are running.
 
 2. Open your browser and go to the frontend development server URL (usually `http://localhost:3000`).
+
+## Makefile Details
+
+The `Makefile` simplifies common tasks during development. Below are the available commands:
+
+- **build**: Compiles the Go backend and places the binary in `bin/build/`.
+    ```bash
+    make build
+    ```
+    - Output: `bin/build/edushare` executable.
+
+- **run**: Builds the backend and runs the compiled binary.
+    ```bash
+    make run
+    ```
+    - The server will run on the port specified in the `.env` file.
+
+- **clean**: Removes all build artifacts.
+    ```bash
+    make clean
+    ```
+
+- **fmt**: Formats the Go code.
+    ```bash
+    make fmt
+    ```
+
+- **goose-status**: Checks the current status of the database migrations.
+    ```bash
+    make goose-status
+    ```
+
+- **migrate-up**: Applies all pending migrations using Goose.
+    ```bash
+    make migrate-up
+    ```
+
+- **migrate-down**: Rolls back the last applied migration.
+    ```bash
+    make migrate-down
+    ```
+
+## Environment Variables
+
+The backend requires a `.env` file to manage configuration settings. Below is an example:
+
+```bash
+PORT=8080
+HOST=http://localhost:5173/
+DB=postgresql://postgres:postgres@localhost:5432/edushare?sslmode=disable
+JWT_SECRET=7*@KMaNg
+JWT_EXPIRATION_IN_SECONDS=10080
+```
+### Environment Variables
+
+- **PORT**: The port on which the backend server will run.
+- **HOST**: The frontend URL.
+- **DB**: The connection string for the PostgreSQL database.
+- **JWT_SECRET**: A secret key used for signing JWT tokens.
+- **JWT_EXPIRATION_IN_SECONDS**: The duration for which the JWT token is valid.
 
 ## Contributing
 
@@ -126,30 +190,15 @@ Contributions are welcome! Please follow these steps:
     git add .
     git commit -m "Add new feature"
     ```
-   - Use clear and concise commit messages.
-   - Follow the commit message convention:
-     - **feat:** A new feature
-     - **fix:** A bug fix
-     - **docs:** Documentation only changes
-     - **style:** Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
-     - **refactor:** A code change that neither fixes a bug nor adds a feature
-     - **perf:** A code change that improves performance
-     - **test:** Adding missing or correcting existing tests
-     - **chore:** Changes to the build process or auxiliary tools and libraries such as documentation generation
-   - Example commit message:
-     ```bash
-     git commit -m "feat: add user authentication"
-     ```
 4. Push to the branch:
     ```bash
     git push origin feature-branch
     ```
 5. Create a pull request.
-6. Make sure to add test cases to the project.
 
 ## License
 
-No license
+No license.
 
 ## Contact
 
