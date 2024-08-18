@@ -1,76 +1,33 @@
-<<<<<<< HEAD
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 import { Home } from "./pages/Home";
-import Signin from "./pages/Signin";
-import Signup from "./pages/Signup";
+import Explore from "./pages/Explore";
+import NotFound from "./pages/NotFound";
+
 const App = () => {
   return (
-    <div>
+    <BrowserRouter>
+      <Routes>
+        {/*makes the default path as mycourses for / */}
+        <Route path="/" element={<Navigate to="/mycourses" />} />
 
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/Signup" element={<Signup />} />
-          <Route path="/Signup" element={<Signin />} />
+        {/*Auth layout*/}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
+        {/*User Layout*/}
+        <Route path="/mycourses" element={<Home />} />
+        <Route path="/explore" element={<Explore />} />
 
-        </Routes>
-      </BrowserRouter>
-    </div>
-    /*    return (
-            <div className="bg-black h-screen px-12 py-8">
-                <div className="bg-white h-full rounded-xl grid md:grid-cols-2 p-2">
-                    <div className="max-md:hidden bg-green-50 ">
-                        <div className="bg-blue-50 h-full pt-20">
-                            <img alt="logo" src="/logo.svg" className="h-[165px] w-[120px] m-auto " />
-                            <h1 className="text-center font-grotesque font-bold text-8xl">Edu Share</h1>
-                            <h3 className="font-grotesque font-medium text-4xl text-center pt-10">Unlock your potential with Shared Knowledge</h3>
-                        </div>
-                    </div>
-                    <div className="bg-red-50 p-20 flex justify-center">
-                       <div className="bg-green-100 h-full rounded-xl p-2 w-[450px]">
-                            <h1 className="font-poppins font-medium text-4xl text-center">Login</h1>
-                        </div> 
-                    </div>
-                </div>
-            </div>
-        );*/
-  )
+        {/*Admin Layout*/}
 
+        {/*Non existant route is redirected to not found page*/}
+        <Route path="*" element={<NotFound />} />
 
-  //    <div className="hidden md:block bg-green-50">
-  //        <div className="bg-blue-50 h-full pt-20">
-  //            <img alt="logo" src="/logo.svg" className="h-[165px] w-[120px] m-auto" />
-  //            <h1 className="text-center font-grotesque font-bold text-8xl">Edu Share</h1>
-  //            <h3 className="font-grotesque font-medium text-4xl text-center pt-10">
-  //                Unlock your potential with Shared Knowledge
-  //            </h3>
-  //        </div>
-  //    </div>
-
-  //    return (
-  //        <div className="bg-black h-screen sm:px-12 sm:py-8">
-  //            <div className="bg-white h-full sm:rounded-xl grid md:grid-cols-2">
-  //                <div className="bg-red-50 flex justify-center">
-  //                    <div className="bg-green-100 h-full rounded-xl">
-  //                        <h1 className="font-poppins font-medium text-4xl text-center">Login</h1>
-  //
-  //                    </div>
-  //                </div>
-  //            </div>
-  //        </div>
-  //    );
-=======
-import React from "react";
-
-const App = ({children } :{children: React.ReactNode} ) => {
-
-    return (
-        <div className="bg-black h-screen sm:px-12 sm:py-8 min-w-[375px]">
-            {children}
-        </div>
-    );
->>>>>>> b7ef97d (login form and register form created)
+      </Routes>
+    </BrowserRouter>
+  );
 };
 
 export default App;

@@ -62,9 +62,9 @@ const LoginForm = () => {
             </Form>
             <div className="flex flex-col  space-y-8 justify-center items-center font-poppins ">
                 <h3 className="mt-2 text-center">or Continue with </h3>
-                <Button type="button" onClick={signInWithGoogle} className="w-full rounded-3xl bg-white text-black font-semibold " >Sign in with Google</Button>
+                <Button type="button" onClick={onSubmit} className="w-full rounded-3xl bg-white text-black font-semibold " >Sign in with Google</Button>
                 <p className="text-xs">Don't have an account ?</p>
-                <Button type="button" onClick={} className="w-full rounded-3xl bg-btnpink text-black border font-semibold border-black" >Create an account</Button>
+                <Button type="button" onClick={onSubmit} className="w-full rounded-3xl bg-btnpink text-black border font-semibold border-black" >Create an account</Button>
             </div>
         </div>
     );
