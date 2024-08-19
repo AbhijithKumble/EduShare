@@ -69,5 +69,21 @@ const LoginForm = () => {
         </div>
     );
 };
+//<div className="bg-50 p-20  flex justify-center">
+//            <div className="bg-green-200 min-h-full     rounded-lg p-2 w-[400px]">
+//                <h1 className="font-poppins font-medium text-4xl text-center mt-4">Login</h1>
+//                <input type="email" className="rounded-full h-10 min-w-72 mt-8 mx-12  text-center text-black  text-opacity-55" placeholder="Email"  />
+//                <input type="password" className="rounded-full h-10 min-w-72 mt-8 mx-12  text-center text-black  text-opacity-55" placeholder="password"  />
+//                <button className=" mx-12 mt-8 bg-green-400   rounded-full h-10 min-w-72">LOGIN</button>
+//                <h1 className="mx-16 mt-2 text-sm font-light text-center"> or Continue with </h1>
+//                <button  className=" mx-12 mt-2   text-gray-950 bg-white rounded-full h-10 min-w-72 flex items-center justify-center"><img src="googleimage.png" alt="Google logo" className="h-10 w-10" />
+//                     <span>Sign in with Google</span>
+//                </button>
+//                <button onClick={()=>navigate('/Signup')}  className="ml-32  mt-2 text-sm font-light text-center"> Don't have an Account </button>
+//
+//
+//
+//            </div>
+//        </div>
 
 export default LoginForm;
