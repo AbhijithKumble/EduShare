@@ -95,3 +95,39 @@ func (s *Store) GetUserByEmail(c context.Context, email string) (types.UserAcc, 
 		return user, nil
 	}
 }
+
+func (s *Store) UpdateUserInfo(c context.Context, userInfo types.UserInfo) (error) {
+  
+	conn, err := s.db.Conn(c)
+
+	if err != nil {
+		log.Fatal("error getting connection to db")
+		return  err
+	}
+
+	defer conn.Close()
+
+	query := `SELECT * FROM users WHERE Email =$1`
+
+	row := conn.QueryRowContext(c, query, string(email))
+  
+  var user types.UserAcc
+  
+	err = row.Scan(&user.UserID, &user.Email, &user.Password, &user.CreatedAt,
+        &user.UpdatedAt, &user.IsVerified, &user.IsAdmin, 
+        &user.VerificationToken, &user.VerificationTokenExpiry,
+        &user.ForgotPasswordToken, &user.ForgotPasswordTokenExpiry)
+
+	switch {
+
+	case err == sql.ErrNoRows:
+		return types.UserAcc{}, fmt.Errorf("user not found")
+	case err != nil:
+		return types.UserAcc{}, err
+	default:
+		return user, nil
+	}
+
+
+  return nil
+}
