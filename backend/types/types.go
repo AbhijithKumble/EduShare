@@ -8,13 +8,13 @@ import (
 )
 
 type UserAcc struct {
-	UserID                    uuid.UUID `json:"id"`
-	Email                     string    `json:"email"`
-	Password                  string    `json:"-"`
-	CreatedAt                 time.Time `json:"createdAt"`
-	UpdatedAt                 time.Time `json:"updatedAt"`
-	IsVerified                bool      `json:"isVerified"`
-	IsAdmin                   bool      `json:"isAdmin"`
+	UserID                    uuid.UUID  `json:"id"`
+	Email                     string     `json:"email"`
+	Password                  string     `json:"-"`
+	CreatedAt                 time.Time  `json:"createdAt"`
+	UpdatedAt                 time.Time  `json:"updatedAt"`
+	IsVerified                bool       `json:"isVerified"`
+	IsAdmin                   bool       `json:"isAdmin"`
 	VerificationToken         *string    `json:"verificationToken"`
 	VerificationTokenExpiry   *time.Time `json:"verificationTokenExpiry"`
 	ForgotPasswordToken       *string    `json:"forgotPasswordToken"`
@@ -22,11 +22,12 @@ type UserAcc struct {
 }
 
 type UserInfo struct {
-	FirstName   string `json:"firstName"`
-	MiddleName  string `json:"middleName"`
-	LastName    string `json:"lastName"`
-	Dept        string `json:"dept"`
-	IsDeptAdmin bool   `json:"isDeptAdmin"`
+	UserID      uuid.UUID `json:"id"`
+	FirstName   string    `json:"firstName"`
+	MiddleName  string    `json:"middleName"`
+	LastName    string    `json:"lastName"`
+	Dept        string    `json:"dept"`
+	IsDeptAdmin bool      `json:"isDeptAdmin"`
 }
 
 type LoginUserPayload struct {
