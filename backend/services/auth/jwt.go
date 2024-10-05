@@ -2,10 +2,12 @@ package auth
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
 	"github.com/AbhijithKumble/EduShare/backend/configs"
+	"github.com/AbhijithKumble/EduShare/backend/types"
 	"github.com/AbhijithKumble/EduShare/backend/utils"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
@@ -25,6 +27,33 @@ func CreateJWT(secret []byte, userID uuid.UUID) (string, error) {
 	}
 
 	return tokenString, err
+}
+
+func WithJWT(handlerFunc http.HandlerFunc, store types.UserStore) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+    tokenString := utils.GetTokenFromRequest(r)
+
+    token, err := validateJWT(tokenString) 
+    
+    if err != nil {
+      log.Printf("failed to validate token : %v", err)
+      permissionDenied(w)
+      return
+    }
+
+    if !token.Valid {
+      log.Print("invalid token")
+      permissionDenied(w)
+      return 
+    } 
+
+    claims := token.Claims.(jwt.MapClaims) 
+    str := claims["userID"].(string)
+    if str != "" {}
+    
+    handlerFunc(w, r)
+
+	}
 }
 
 func validateJWT(tokenString string) (*jwt.Token, error) {

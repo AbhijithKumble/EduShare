@@ -1,7 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import { Home } from "./pages/Home";
+import Home from "./pages/Home";
 import Explore from "./pages/Explore";
 import NotFound from "./pages/NotFound";
 
@@ -14,7 +14,10 @@ const App = () => {
 
         {/*Auth layout*/}
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/sigup" element={<Register />} />
+        <Route path="/verifyemail" element={<Login />} />
+        <Route path="/forgotpassword" element={<Register />} />
+        <Route path="/resetpassword" element={<Register />} />
 
         {/*User Layout*/}
         <Route path="/mycourses" element={<Home />} />

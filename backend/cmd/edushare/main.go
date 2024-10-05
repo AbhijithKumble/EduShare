@@ -20,7 +20,7 @@ func main() {
 	}
 
 	defer connPool.Close()
-
+    
 	server := api.NewApiServer(portString, connPool.DB)
 
 	if err = server.Run(); err != nil {

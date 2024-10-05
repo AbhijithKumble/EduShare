@@ -16,6 +16,7 @@ type Config struct {
 	Host                      string
 	JWT_SECRET                string
 	JWT_EXPIRATION_IN_SECONDS int64
+	EMAIL_CLIENT_AUTH_TOKEN   string
 }
 
 var Envs = initConfig()
@@ -49,6 +50,10 @@ func (c *Config) checkEnvs() error {
 	if c.JWT_EXPIRATION_IN_SECONDS == 0 {
 		return fmt.Errorf("environment variable 'JWT_EXPIRATION_IN_SECONDS' is 0")
 	}
+  
+	if c.EMAIL_CLIENT_AUTH_TOKEN == "" {
+		return fmt.Errorf("email auth token string is empty")
+	}
 
 	return nil
 }
@@ -57,7 +62,7 @@ func (c *Config) checkEnvs() error {
 func GetConfig() (*Config, error) {
 
 	err := godotenv.Load(".env")
-  
+
 	if err != nil {
 		return nil, fmt.Errorf(" error loading .env file: %v", err)
 	}
@@ -74,7 +79,8 @@ func GetConfig() (*Config, error) {
 		Db:                        os.Getenv("DB"),
 		Host:                      os.Getenv("HOST"),
 		JWT_SECRET:                os.Getenv("JWT_SECRET"),
-		JWT_EXPIRATION_IN_SECONDS: expiration, 
+		JWT_EXPIRATION_IN_SECONDS: expiration,
+    EMAIL_CLIENT_AUTH_TOKEN: os.Getenv("EMAIL_CLIENT_AUTH_TOKEN"),
 	}
 
 	if err := config.checkEnvs(); err != nil {

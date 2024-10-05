@@ -1,6 +1,13 @@
-export const Home =()=> {
-  return <h1>This is home</h1>;
+import Layout from "./Layout";
 
+const Home =()=> {
+  return (
+    <Layout>
+      <div> This is home</div>
+    </Layout>
+  ); 
 };
 
+
+export default Home;
 

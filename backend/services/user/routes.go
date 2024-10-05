@@ -25,6 +25,14 @@ func NewHandler(store types.UserStore) *Handler {
 func (h *Handler) RegisterRoutes(r *mux.Router) {
 	r.HandleFunc("/login", h.HandleLogin).Methods("POST")
 	r.HandleFunc("/signup", h.HandleSignup).Methods("POST")
+	r.HandleFunc("/verifyemail/${userID}", h.HandleVerifyEmail).Methods("POST") //middleware
+	r.HandleFunc("/forgotpassword/${userID}", h.HandleForgotPassword).Methods("POST")
+	r.HandleFunc("/resetpassword/${userID}", h.HandleResetPassword).Methods("POST") //create verifyemailmiddleware
+
+	//user routes
+	//change it to home
+	r.HandleFunc("/users/{userID}", auth.WithJWT(h.HandleGetUser, h.store)).Methods("GET")
+	r.HandleFunc("/users/{userID}/addDetails", auth.WithJWT(h.HandleGetUser, h.store)).Methods("GET")
 }
 
 func (h *Handler) HandleLogin(w http.ResponseWriter, r *http.Request) {
@@ -40,7 +48,7 @@ func (h *Handler) HandleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u, err := h.store.GetUserByEmail(r.Context(), user.Email)
+	u, err, _ := h.store.GetUserByEmail(r.Context(), user.Email)
 
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("not found, invalid email or password"))
@@ -49,6 +57,13 @@ func (h *Handler) HandleLogin(w http.ResponseWriter, r *http.Request) {
 
 	if !auth.ComparePassword(u.Password, user.Password) {
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid email or password"))
+		return
+	}
+
+	isVerified := u.IsVerified
+
+	if !isVerified {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("User account not verified"))
 		return
 	}
 
@@ -88,15 +103,52 @@ func (h *Handler) HandleSignup(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		switch err.Error() {
+		case "user is not verified":
+			utils.WriteError(w, 400, fmt.Errorf("User is not verified"))
+
 		case "user already exists in database":
 			utils.WriteError(w, 409, fmt.Errorf("User already exists"))
+    
+    case "error sending mail":
+			utils.WriteError(w, 500, fmt.Errorf("Something went wrong"))
 
 		default:
-			log.Printf("error creating user %v", err)
+			log.Printf("error creating user -> %v", err)
 			utils.WriteError(w, 500, fmt.Errorf("Something went wrong"))
 		}
 		return
 	}
+  
+	utils.WriteJSON(w, 201, "User created Successfully")
+}
 
-	utils.WriteError(w, 201, fmt.Errorf("User created Successfully"))
+func (h *Handler) HandleForgotPassword(w http.ResponseWriter, r *http.Request) {
+	var payload types.ForgotPasswordPayLoad
+
+	decoder := json.NewDecoder(r.Body)
+	decoder.Decode(&payload)
+	email := payload.Email
+
+	_, err, code := h.store.GetUserByEmail(r.Context(), email)
+
+	if err != nil {
+		utils.WriteError(w, code, err)
+	}
+
+	utils.WriteJSON(w, http.StatusOK, "User found")
+}
+
+func (h *Handler) HandleResetPassword(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (h *Handler) HandleGetUser(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (h *Handler) HandleVerifyEmail(w http.ResponseWriter, r *http.Request) {
+//  var userID uuid.UUID
+  
+ // decoder := json.NewDecoder(r.Body)
+
 }
