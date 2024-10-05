@@ -5,6 +5,7 @@ const Login = () => {
   return (
     <div className="bg-black h-screen p-10 flex items-center justify-center">
       <div className="bg-white h-full w-full rounded-xl grid md:grid-cols-2 p-2">
+        
         {/* contains two grids with left side is the company logo and right side is auth*/}
         <div className="max-md:hidden bg-green-50 ">
           <div className="bg-blue-50 h-full pt-20">
@@ -13,7 +14,7 @@ const Login = () => {
             <h3 className="font-grotesque font-medium text-4xl text-center pt-10">Unlock your potential with Shared Knowledge</h3>
           </div>
         </div>
-
+        
         <div className="bg-lightpurple rounded-xl  h-full space-y-16">
           <h1 className="font-poppins font-medium text-4xl text-center pt-10">Login</h1>
           <LoginForm />
@@ -22,6 +23,5 @@ const Login = () => {
     </div>
   );
 };
-
 
 export default Login;
