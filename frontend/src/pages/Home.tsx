@@ -6,8 +6,6 @@ const Home =()=> {
       <div> This is home</div>
     </Layout>
   ); 
-};
-
 
 export default Home;
 
