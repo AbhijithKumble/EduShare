@@ -62,7 +62,14 @@ type EmailPayload struct {
 
 type UserStore interface {
 	GetUserByEmail(c context.Context, email string) (UserAcc, error, int)
-	CreateUser(c context.Context, user UserAcc) error
+	CreateUser(c context.Context, user UserAcc) (*uuid.UUID , error)
+  VerifyOtp(c context.Context, email string, password string, otp string) (int, error) 
+}
+
+type OtpPayload struct {
+  Email    string `json:"email"`
+  Password string `json:"password"`
+  Otp      string `json:"otp"`
 }
 
 type Dept struct {
