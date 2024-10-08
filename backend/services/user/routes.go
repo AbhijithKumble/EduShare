@@ -3,7 +3,6 @@ package user
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/AbhijithKumble/EduShare/backend/configs"
@@ -25,9 +24,9 @@ func NewHandler(store types.UserStore) *Handler {
 func (h *Handler) RegisterRoutes(r *mux.Router) {
 	r.HandleFunc("/login", h.HandleLogin).Methods("POST")
 	r.HandleFunc("/signup", h.HandleSignup).Methods("POST")
-	r.HandleFunc("/verifyemail/${userID}", h.HandleVerifyEmail).Methods("POST") //middleware
-	r.HandleFunc("/forgotpassword/${userID}", h.HandleForgotPassword).Methods("POST")
-	r.HandleFunc("/resetpassword/${userID}", h.HandleResetPassword).Methods("POST") //create verifyemailmiddleware
+	r.HandleFunc("/verifyemail/{userID}", h.HandleVerifyEmail).Methods("POST") //middleware
+	r.HandleFunc("/forgotpassword/{userID}", h.HandleForgotPassword).Methods("POST")
+	r.HandleFunc("/resetpassword/{userID}", h.HandleResetPassword).Methods("POST") //create verifyemailmiddleware
 
 	//user routes
 	//change it to home
@@ -99,27 +98,33 @@ func (h *Handler) HandleSignup(w http.ResponseWriter, r *http.Request) {
 	var user types.UserAcc
 	user.Email = params.Email
 	user.Password = params.Password
-	err = h.store.CreateUser(r.Context(), user)
+  id, err := h.store.CreateUser(r.Context(), user)
 
 	if err != nil {
 		switch err.Error() {
 		case "user is not verified":
 			utils.WriteError(w, 400, fmt.Errorf("User is not verified"))
 
-		case "user already exists in database":
+		case "user already exists in the database":
 			utils.WriteError(w, 409, fmt.Errorf("User already exists"))
-    
-    case "error sending mail":
+
+		case "error sending mail":
 			utils.WriteError(w, 500, fmt.Errorf("Something went wrong"))
 
 		default:
-			log.Printf("error creating user -> %v", err)
 			utils.WriteError(w, 500, fmt.Errorf("Something went wrong"))
 		}
 		return
 	}
-  
-	utils.WriteJSON(w, 201, "User created Successfully")
+
+  user.UserID = *id 
+
+  response := map[string]string{
+     "userID": (user.UserID).String(),
+     "message": "User created Successfully",
+  }
+
+  utils.WriteJSON(w, 201,response)
 }
 
 func (h *Handler) HandleForgotPassword(w http.ResponseWriter, r *http.Request) {
@@ -147,8 +152,24 @@ func (h *Handler) HandleGetUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) HandleVerifyEmail(w http.ResponseWriter, r *http.Request) {
-//  var userID uuid.UUID
-  
- // decoder := json.NewDecoder(r.Body)
+	var payload types.OtpPayload
+	decoder := json.NewDecoder(r.Body)
+  err := decoder.Decode(&payload)
 
+  if err != nil {
+    utils.WriteError(w, 500, fmt.Errorf("error in reading json"))
+    return
+  }
+
+	defer r.Body.Close()
+
+	statusCode, err := h.store.VerifyOtp(r.Context(), payload.Email, payload.Password, payload.Otp)
+
+	if err != nil {
+		utils.WriteError(w, statusCode, err)
+		return
+	}
+
+	utils.WriteJSON(w, statusCode, "User verified Successfully")
+	return
 }

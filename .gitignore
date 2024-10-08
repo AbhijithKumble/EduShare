@@ -2,4 +2,11 @@
 backend/.env
 frontend/.env
 .vscode
+<<<<<<< HEAD
 .DS_Store
+.env
+backend/.env
+frontend/.env
+=======
+.DS_Store
+>>>>>>> main
