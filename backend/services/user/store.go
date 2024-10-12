@@ -24,75 +24,75 @@ func NewStore(db *sql.DB) *Store {
 }
 
 func (s *Store) CreateUser(c context.Context, user types.UserAcc) (*uuid.UUID, error) {
-    checkQVerified := `SELECT EXISTS (SELECT UserID FROM users WHERE Email=$1 AND IsVerified = true)`
-    checkQ := `SELECT EXISTS(SELECT 1 FROM users WHERE Email=$1)`
+	checkQVerified := `SELECT EXISTS (SELECT UserID FROM users WHERE Email=$1 AND IsVerified = true)`
+	checkQ := `SELECT EXISTS(SELECT 1 FROM users WHERE Email=$1)`
 
-    var exists bool
+	var exists bool
 
-    conn, err := s.db.Conn(c)
-    if err != nil {
-        log.Fatal("error getting connection to db")
-        return nil, err
-    }
-    defer conn.Close()
+	conn, err := s.db.Conn(c)
+	if err != nil {
+		log.Fatal("error getting connection to db")
+		return nil, err
+	}
+	defer conn.Close()
 
-    // Check if a verified user exists
-    err = conn.QueryRowContext(c, checkQVerified, user.Email).Scan(&exists)
+	// Check if a verified user exists
+	err = conn.QueryRowContext(c, checkQVerified, user.Email).Scan(&exists)
 
-    if err != nil {
-        log.Fatal("error checking if user exists")
-        return nil, err
-    }
-    if exists == true {
-        return nil, fmt.Errorf("user already exists in the database")
-    }
+	if err != nil {
+		log.Fatal("error checking if user exists")
+		return nil, err
+	}
+	if exists == true {
+		return nil, fmt.Errorf("user already exists in the database")
+	}
 
-    // Check if the user exists
-    err = conn.QueryRowContext(c, checkQ, user.Email).Scan(&exists)
+	// Check if the user exists
+	err = conn.QueryRowContext(c, checkQ, user.Email).Scan(&exists)
 
-    if err != nil {
-        log.Fatal("error checking if user exists")
-        return nil, err
-    }
+	if err != nil {
+		log.Fatal("error checking if user exists")
+		return nil, err
+	}
 
-    // Prepare to create user or update password if already present
-    insertQ := `INSERT INTO users (UserID, Email, Password, VerificationToken, VerificationTokenExpiry)
+	// Prepare to create user or update password if already present
+	insertQ := `INSERT INTO users (UserID, Email, Password, VerificationToken, VerificationTokenExpiry)
                  VALUES ($1, $2, $3, $4, $5)
                  ON CONFLICT (Email) 
                  DO UPDATE SET 
                      Password = EXCLUDED.Password,
                      VerificationToken = EXCLUDED.VerificationToken,
                      VerificationTokenExpiry = EXCLUDED.VerificationTokenExpiry
-                 RETURNING UserID`  // Return the UserID on conflict as well
+                 RETURNING UserID` // Return the UserID on conflict as well
 
-    hashedPassword, err := auth.HashPassword(user.Password)
-    if err != nil {
-        return nil, err
-    }
+	hashedPassword, err := auth.HashPassword(user.Password)
+	if err != nil {
+		return nil, err
+	}
 
-    // Generate verification token and expiration time
-    verifyCode := math.Floor(100000 + rand.Float64()*900000)
-    verificationToken := strconv.FormatFloat(verifyCode, 'f', 0, 64)
-    expirationTime := time.Now().Add(30 * time.Minute)
+	// Generate verification token and expiration time
+	verifyCode := math.Floor(100000 + rand.Float64()*900000)
+	verificationToken := strconv.FormatFloat(verifyCode, 'f', 0, 64)
+	expirationTime := time.Now().Add(30 * time.Minute)
 
-    var userID uuid.UUID  // Variable to hold the returned UserID
+	var userID uuid.UUID // Variable to hold the returned UserID
 
-    // Execute the insert query and get the UserID
-    err = conn.QueryRowContext(c, insertQ, uuid.New(), user.Email, hashedPassword, verificationToken, expirationTime).Scan(&userID)
-    if err != nil {
-        return nil, err
-    }
+	// Execute the insert query and get the UserID
+	err = conn.QueryRowContext(c, insertQ, uuid.New(), user.Email, hashedPassword, verificationToken, expirationTime).Scan(&userID)
+	if err != nil {
+		return nil, err
+	}
 
-    otpSubject := "OTP to verify your EduShare account"
-    mailBody := "This is your OTP"
+	otpSubject := "OTP to verify your EduShare account"
+	mailBody := "This is your OTP"
 
-    err = auth.SendVerificationOtp(user.Email, otpSubject, mailBody, verificationToken)
-    if err != nil {
-        log.Printf("error in sending OTP")
-        return nil, err
-    }
+	err = auth.SendVerificationOtp(user.Email, otpSubject, mailBody, verificationToken)
+	if err != nil {
+		log.Printf("error in sending OTP")
+		return nil, err
+	}
 
-    return &userID, nil  // Return the pointer to the collected UserID
+	return &userID, nil // Return the pointer to the collected UserID
 }
 
 func (s *Store) VerifyOtp(c context.Context, email string, password string, otp string) (int, error) {
@@ -102,7 +102,7 @@ func (s *Store) VerifyOtp(c context.Context, email string, password string, otp 
 		return 500, err
 	}
 
-	if !auth.ComparePassword(user.Password,password) {
+	if !auth.ComparePassword(user.Password, password) {
 		return 400, fmt.Errorf("invalid password")
 	}
 
@@ -122,7 +122,7 @@ func (s *Store) VerifyOtp(c context.Context, email string, password string, otp 
 		return 404, fmt.Errorf("invalid token")
 	}
 
-  	// If all checks pass, mark the user as verified
+	// If all checks pass, mark the user as verified
 	updateQ := `UPDATE users SET IsVerified = true WHERE UserID = $1`
 	_, err = s.db.ExecContext(c, updateQ, user.UserID)
 
