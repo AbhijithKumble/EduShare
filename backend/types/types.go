@@ -31,11 +31,11 @@ type UserInfo struct {
 }
 
 type UserInfoPayLoad struct {
-	Email       string `json:"email"`
-	FirstName   string `json:"firstName"`
-	MiddleName  string `json:"middleName"`
-	LastName    string `json:"lastName"`
-	Dept        string `json:"dept"`
+	Email      string `json:"email"`
+	FirstName  string `json:"firstName"`
+	MiddleName string `json:"middleName"`
+	LastName   string `json:"lastName"`
+	Dept       string `json:"dept"`
 }
 
 type LoginUserPayload struct {
@@ -62,14 +62,14 @@ type EmailPayload struct {
 
 type UserStore interface {
 	GetUserByEmail(c context.Context, email string) (UserAcc, error, int)
-	CreateUser(c context.Context, user UserAcc) (*uuid.UUID , error)
-  VerifyOtp(c context.Context, email string, password string, otp string) (int, error) 
+	CreateUser(c context.Context, user UserAcc) (*uuid.UUID, error)
+	VerifyOtp(c context.Context, email string, password string, otp string) (int, error)
 }
 
 type OtpPayload struct {
-  Email    string `json:"email"`
-  Password string `json:"password"`
-  Otp      string `json:"otp"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Otp      string `json:"otp"`
 }
 
 type Dept struct {
@@ -80,6 +80,11 @@ type Dept struct {
 type DeptPayload struct {
 	DeptCode string `json:"deptCode" validate:"required, deptCode"`
 	DeptName string `json:"deptName" validate:"required, deptName"`
+}
+
+type DeptStore interface {
+	GetDepts(c context.Context) ([]Dept, error)
+	CreateDepts(c context.Context, dept DeptPayload) error
 }
 
 type Course struct {
@@ -96,6 +101,7 @@ type CoursePayload struct {
 
 type CourseStore interface {
 	GetCourses(c context.Context) ([]Course, error)
+	CreateCourses(c context.Context, courses CoursePayload) error
 }
 
 type Favourites struct {
