@@ -24,7 +24,7 @@ func NewHandler(store types.UserStore) *Handler {
 func (h *Handler) RegisterRoutes(r *mux.Router) {
 	r.HandleFunc("/login", h.HandleLogin).Methods("POST")
 	r.HandleFunc("/signup", h.HandleSignup).Methods("POST")
-	r.HandleFunc("/verifyemail/{userID}", h.HandleVerifyEmail).Methods("POST") //middleware
+  r.HandleFunc("/verifyemail/{userID}", h.HandleVerifyEmail).Methods("POST").Name("verifyemail") 
 	r.HandleFunc("/forgotpassword/{userID}", h.HandleForgotPassword).Methods("POST")
 	r.HandleFunc("/resetpassword/{userID}", h.HandleResetPassword).Methods("POST") //create verifyemailmiddleware
 
@@ -32,11 +32,12 @@ func (h *Handler) RegisterRoutes(r *mux.Router) {
 	//change it to home
 	r.HandleFunc("/users/{userID}", auth.WithJWT(h.HandleGetUser, h.store)).Methods("GET")
 	r.HandleFunc("/users/{userID}/addDetails", auth.WithJWT(h.HandleGetUser, h.store)).Methods("GET")
+
 }
 
 func (h *Handler) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	var user types.LoginUserPayload
-
+   
 	if err := utils.ParseJSON(r, &user); err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
 	}
@@ -50,19 +51,19 @@ func (h *Handler) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	u, err, _ := h.store.GetUserByEmail(r.Context(), user.Email)
 
 	if err != nil {
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("not found, invalid email or password"))
+		utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("not found, invalid email or password"))
 		return
 	}
 
 	if !auth.ComparePassword(u.Password, user.Password) {
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid email or password"))
+		utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("invalid email or password"))
 		return
 	}
 
 	isVerified := u.IsVerified
 
 	if !isVerified {
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("User account not verified"))
+		utils.WriteError(w, http.StatusForbidden, fmt.Errorf("User account not verified"))
 		return
 	}
 
@@ -109,7 +110,7 @@ func (h *Handler) HandleSignup(w http.ResponseWriter, r *http.Request) {
 			utils.WriteError(w, 409, fmt.Errorf("User already exists"))
 
 		case "error sending mail":
-			utils.WriteError(w, 500, fmt.Errorf("Something went wrong"))
+			utils.WriteError(w, 500, fmt.Errorf("Error sending email"))
 
 		default:
 			utils.WriteError(w, 500, fmt.Errorf("Something went wrong"))
@@ -156,6 +157,7 @@ func (h *Handler) HandleVerifyEmail(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
   err := decoder.Decode(&payload)
 
+  fmt.Print(payload.Otp)
   if err != nil {
     utils.WriteError(w, 500, fmt.Errorf("error in reading json"))
     return
@@ -163,7 +165,7 @@ func (h *Handler) HandleVerifyEmail(w http.ResponseWriter, r *http.Request) {
 
 	defer r.Body.Close()
 
-	statusCode, err := h.store.VerifyOtp(r.Context(), payload.Email, payload.Password, payload.Otp)
+	statusCode, err := h.store.VerifyOtp(r.Context(), payload.UserID, payload.Otp)
 
 	if err != nil {
 		utils.WriteError(w, statusCode, err)
