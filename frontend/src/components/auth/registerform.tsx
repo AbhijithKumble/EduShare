@@ -1,119 +1,134 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-
-import { RegisterSchema } from "@/schema/auth"
-
+import { useNavigate } from "react-router-dom"
+import { SignUpSchema } from "@/schema/auth"
 import { Button } from "@/components/ui/button"
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import axios from "axios"
+import toast, { Toaster } from "react-hot-toast"
 
-const RegisterForm = () => {
+const SignUpForm = () => {
+  const navigate = useNavigate();
 
-    const onSubmit = () => {
+  const onEmailPasswordSubmit = async (body: z.infer<typeof SignUpSchema>) => {
+    const toastId = toast.loading('Loading...')
+    try {
+      const response: any = await axios.post('http://localhost:8080/api/v1/signup', body);
+      console.log(response);
+      // Assuming the response contains a success message or user info
+      toast.success('User created successfully', {
+        id: toastId
+      });
+      const userID = response.data.userID;
+      navigate(`/verifyemail/${userID}`)
+    } catch (error: any) {
+      // Check if the error is due to a response from the server
+      console.log(error);
+      if (error.response) {
+        // If there is a response (status code != 2xx)
+        const errorMessage = error.response.data?.message || 'Signup failed';
+        toast.error(errorMessage, {
+          id: toastId
+        });
+        console.error('Signup failed', error.response);
+      } else if (error.request) {
+        // If there is no response (e.g., network error)
+        toast.error('Network error, please try again later', {
+          id: toastId
+        });
+        console.error('Signup failed - No response', error.request);
+      } else {
+        // If error occurred during setup or something else
+        toast.error('Something went wrong', {
+          id: toastId
+        });
+        console.error('Error', error.message);
+      }
+    }
+  };
+  const form = useForm<z.infer<typeof SignUpSchema>>({
+    resolver: zodResolver(SignUpSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      name: "",
+      confirmPassword: ""
+    },
+  })
 
-    };
+  return (
+    <div className="space-y-4">
+      <Toaster />
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onEmailPasswordSubmit)} className="space-y-4 font-poppins justify-center">
 
-
-    const form = useForm<z.infer<typeof RegisterSchema>>({
-        resolver: zodResolver(RegisterSchema),
-        defaultValues: {
-            email: "",
-            password: "",
-            name: "",
-            confirmPassword: ""
-        },
-    })
-
-    return (
-        <div className="space-y-4">
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 font-poppins justify-center">
-
-                    <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormControl>
-                                    <Input placeholder="Name" {...field} className="rounded-3xl" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormControl>
-                                    <Input placeholder="Email" {...field} className="rounded-3xl" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="password"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormControl>
-                                    <Input placeholder="Password" {...field} className="rounded-3xl" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="confirmPassword"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormControl>
-                                    <Input placeholder="Confirm Password" {...field} className="rounded-3xl" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <Button type="submit" className="w-full rounded-3xl bg-btnpink text-black border font-semibold border-black" >Create Account</Button>
-                </form>
-            </Form>
-            <div className="flex flex-col  space-y-4 justify-center items-center font-poppins ">
-                <h3 className="mt-2 text-center">or Continue with </h3>
-                <Button type="submit" className="w-full rounded-3xl bg-white text-black font-semibold " >Sign in with Google</Button>
-                <p className="text-xs">Already have an account ?</p>
-                <Button type="submit" className="w-full rounded-3xl bg-btnpink text-black border font-semibold border-black" >Go to Login</Button>
-            </div>
-        </div>
-    );
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input placeholder="Name" {...field} className="rounded-3xl" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input placeholder="Email" {...field} className="rounded-3xl" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input placeholder="Password" {...field} className="rounded-3xl" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input placeholder="Confirm Password" {...field} className="rounded-3xl" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit" className="w-full rounded-3xl bg-btnpink text-black border font-semibold border-black" >Create Account</Button>
+        </form>
+      </Form>
+      <div className="flex flex-col  space-y-4 justify-center items-center font-poppins ">
+        <h3 className="mt-2 text-center">or Continue with </h3>
+        <Button type="submit" className="w-full rounded-3xl bg-white text-black font-semibold " >Sign in with Google</Button>
+        <p className="text-xs">Already have an account ?</p>
+        <Button type="submit" className="w-full rounded-3xl bg-btnpink text-black border font-semibold border-black" onClick={() => navigate('/login')} >Go to Login</Button>
+      </div>
+    </div>
+  );
 };
-/*
- *
-<div className="bg-50 p-20  flex justify-center">
-//            <div className="bg-green-200 min-h-full     rounded-lg p-2 w-[400px]">
-//                <h1 className="font-poppins font-medium text-4xl text-center mt-4">Login</h1>
-//                <input type="email" className="rounded-full h-10 min-w-72 mt-8 mx-12  text-center text-black  text-opacity-55" placeholder="Email"  />
-//                <input type="password" className="rounded-full h-10 min-w-72 mt-8 mx-12  text-center text-black  text-opacity-55" placeholder="password"  />
-//                <button className=" mx-12 mt-8 bg-green-400   rounded-full h-10 min-w-72">LOGIN</button>
-//                <h1 className="mx-16 mt-2 text-sm font-light text-center"> or Continue with </h1>
-//                <button  className=" mx-12 mt-2   text-gray-950 bg-white rounded-full h-10 min-w-72 flex items-center justify-center"><img src="googleimage.png" alt="Google logo" className="h-10 w-10" />
-//                     <span>Sign in with Google</span>
-//                </button>
-//                <button onClick={()=>navigate('/Signup')}  className="ml-32  mt-2 text-sm font-light text-center"> Don't have an Account </button>
-//
-//
-//
-//            </div>
-//        </div>
- *
- * */
-export default RegisterForm;
+
+export default SignUpForm;

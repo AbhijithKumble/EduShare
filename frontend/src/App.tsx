@@ -1,9 +1,12 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
 import Home from "./pages/Home";
 import Explore from "./pages/Explore";
 import NotFound from "./pages/NotFound";
+import SignUp from "./pages/Signup";
+import VerifyEmail from "./pages/VerifyEmail";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 const App = () => {
   return (
@@ -14,10 +17,10 @@ const App = () => {
 
         {/*Auth layout*/}
         <Route path="/login" element={<Login />} />
-        <Route path="/sigup" element={<Register />} />
-        <Route path="/verifyemail" element={<Login />} />
-        <Route path="/forgotpassword" element={<Register />} />
-        <Route path="/resetpassword" element={<Register />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/verifyemail/:userID" element={<VerifyEmail />} />
+        <Route path="/forgotpassword/:userID" element={<ForgotPassword />} />
+        <Route path="/resetpassword/:userID" element={<ResetPassword />} />
 
         {/*User Layout*/}
         <Route path="/mycourses" element={<Home />} />

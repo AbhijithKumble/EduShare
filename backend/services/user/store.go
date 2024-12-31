@@ -95,42 +95,78 @@ func (s *Store) CreateUser(c context.Context, user types.UserAcc) (*uuid.UUID, e
 	return &userID, nil // Return the pointer to the collected UserID
 }
 
-func (s *Store) VerifyOtp(c context.Context, email string, password string, otp string) (int, error) {
-	user, err, _ := s.GetUserByEmail(c, email)
-
+func (s *Store) VerifyOtp(c context.Context, userID string, otp string) (int, error) {
+	// Fetch user details by userID
+	user, err, statusCode := s.GetUserByUserID(c, userID)
 	if err != nil {
-		return 500, err
+		return statusCode, err // Return the correct status code from GetUserByUserID
 	}
 
-	if !auth.ComparePassword(user.Password, password) {
-		return 400, fmt.Errorf("invalid password")
+	// Ensure the verification token and expiry are valid
+	if user.VerificationToken == nil || *(user.VerificationToken) == "" {
+		return 400, fmt.Errorf("verification token not found")
 	}
 
 	if user.VerificationTokenExpiry == nil {
-		return 404, fmt.Errorf("invalid token")
+		return 400, fmt.Errorf("token expiry is not set")
 	}
 
-	if (user.VerificationTokenExpiry).Before(time.Now()) {
-		return 404, fmt.Errorf("invalid token")
+	// Check if the token has expired
+	if user.VerificationTokenExpiry.Before(time.Now()) {
+		return 400, fmt.Errorf("token has expired")
 	}
 
-	if user.VerificationToken == nil {
-		return 400, fmt.Errorf("token not found")
-	}
-
+	// Check if the provided OTP matches the stored token
 	if *(user.VerificationToken) != otp {
-		return 404, fmt.Errorf("invalid token")
+		return 400, fmt.Errorf("invalid OTP")
 	}
 
 	// If all checks pass, mark the user as verified
 	updateQ := `UPDATE users SET IsVerified = true WHERE UserID = $1`
 	_, err = s.db.ExecContext(c, updateQ, user.UserID)
-
 	if err != nil {
-		return 500, fmt.Errorf("error updating verification status")
+		return 500, fmt.Errorf("error updating verification status: %v", err)
 	}
 
+	// Successfully verified
 	return 200, nil
+}
+
+func (s *Store) GetUserByUserID(c context.Context, userID string) (types.UserAcc, error, int) {
+	// Establish a connection to the database
+	conn, err := s.db.Conn(c)
+	if err != nil {
+		log.Fatal("error getting connection to db")
+		return types.UserAcc{}, err, 500
+	}
+	defer conn.Close()
+
+	// SQL query to get user by UserID
+	query := `SELECT * FROM users WHERE UserID = $1`
+
+	// Execute the query and store the result in the row
+	row := conn.QueryRowContext(c, query, userID)
+
+	var user types.UserAcc
+
+	// Scan the row into the user struct
+	err = row.Scan(&user.UserID, &user.Email, &user.Password, &user.CreatedAt,
+		&user.UpdatedAt, &user.IsVerified, &user.IsAdmin,
+		&user.VerificationToken, &user.VerificationTokenExpiry,
+		&user.ForgotPasswordToken, &user.ForgotPasswordTokenExpiry)
+
+	// Check for errors and handle accordingly
+	switch {
+	case err == sql.ErrNoRows:
+		// If no rows were found for the userID
+		return types.UserAcc{}, fmt.Errorf("user not found"), 404
+	case err != nil:
+		// Handle any other errors
+		return types.UserAcc{}, err, 500
+	default:
+		// Return the user data
+		return user, nil, 200
+	}
 }
 
 func (s *Store) GetUserByEmail(c context.Context, email string) (types.UserAcc, error, int) {

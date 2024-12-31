@@ -1,4 +1,3 @@
-import React from 'react'
 import {  useNavigate } from 'react-router-dom';
 
 function Signin() {
@@ -27,9 +26,6 @@ function Signin() {
                      <span>Sign in with Google</span>
                 </button>
                 <button onClick={()=>navigate('/Signup')}  className="ml-32  mt-2 text-sm font-light text-center"> Don't have an Account </button>
-  
-            
-           
             </div>
         </div>
     </div>

@@ -14,28 +14,59 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useNavigate } from "react-router-dom"
+import axios from "axios"
+
+import toast, { Toaster } from 'react-hot-toast';
+
 
 const LoginForm = () => {
 
   const navigate = useNavigate();
-
-  const onSubmit = () => {
-
-  };
-
-
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
       email: "",
       password: "",
-    },
+    }
   })
+
+  const onSubmit = () => {
+
+  };
+
+  const onEmailPasswordSubmit = async (body: z.infer<typeof LoginSchema>) => {
+    try {
+      const response: any = await axios.post('http://localhost:8080/api/v1/login', body);
+      console.log(response);
+
+      // Assuming you store the token here, if returned in the response
+      const { token } = response.data;
+      localStorage.setItem('edushare-token', token);
+
+      navigate('/mycourses');
+    } catch (error: any) {
+      // Check if the error is due to a response from the server
+      if (error.response) {
+        // If there is a response (status code != 2xx)
+        toast.error(error.response.data?.message || 'Login failed');
+        console.error('Login failed', error.response);
+      } else if (error.request) {
+        // If there is no response (e.g., network error)
+        toast.error('Network error, please try again later');
+        console.error('Login failed - No response', error.request);
+      } else {
+        // If error occurred during setup or something else
+        toast.error('Something went wrong');
+        console.error('Error', error.message);
+      }
+    }
+  };
 
   return (
     <div className="space-y-8">
+      <Toaster />
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 font-poppins justify-center">
+        <form onSubmit={form.handleSubmit(onEmailPasswordSubmit)} className="space-y-8 font-poppins justify-center">
           <FormField
             control={form.control}
             name="email"
@@ -67,26 +98,10 @@ const LoginForm = () => {
         <h3 className="mt-2 text-center" >or Continue with </h3>
         <Button type="button" onClick={onSubmit} className="w-full rounded-3xl bg-white text-black font-semibold " >Sign in with Google</Button>
         <p className="text-xs">Don't have an account ?</p>
-        <Button type="button" onClick={() => navigate('/register')} className="w-full rounded-3xl bg-btnpink text-black border font-semibold border-black" >Create an account</Button>
+        <Button type="button" onClick={() => navigate('/signup')} className="w-full rounded-3xl bg-btnpink text-black border font-semibold border-black" >Create an account</Button>
       </div>
     </div>
   );
 };
-//<div className="bg-50 p-20  flex justify-center">
-//            <div className="bg-green-200 min-h-full     rounded-lg p-2 w-[400px]">
-//                <h1 className="font-poppins font-medium text-4xl text-center mt-4">Login</h1>
-//                <input type="email" className="rounded-full h-10 min-w-72 mt-8 mx-12  text-center text-black  text-opacity-55" placeholder="Email"  />
-//                <input type="password" className="rounded-full h-10 min-w-72 mt-8 mx-12  text-center text-black  text-opacity-55" placeholder="password"  />
-//                <button className=" mx-12 mt-8 bg-green-400   rounded-full h-10 min-w-72">LOGIN</button>
-//                <h1 className="mx-16 mt-2 text-sm font-light text-center"> or Continue with </h1>
-//                <button  className=" mx-12 mt-2   text-gray-950 bg-white rounded-full h-10 min-w-72 flex items-center justify-center"><img src="googleimage.png" alt="Google logo" className="h-10 w-10" />
-//                     <span>Sign in with Google</span>
-//                </button>
-//                <button onClick={()=>navigate('/Signup')}  className="ml-32  mt-2 text-sm font-light text-center"> Don't have an Account </button>
-//
-//
-//
-//            </div>
-//        </div>
 
 export default LoginForm;
